@@ -21,6 +21,8 @@ Route::post('api/register', 'TokenAuthController@register');
 Route::post('api/authenticate', 'TokenAuthController@authenticate');
 Route::get('api/authenticate/user', 'TokenAuthController@getAuthenticatedUser');
 
+
+// resource is all get insert delete update
 Route::resource('api/todo', 'TodoController');
 
 /*
