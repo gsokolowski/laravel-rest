@@ -20,6 +20,17 @@ class TokenAuthController extends Controller
 
     }
 
+    // create new authenticated user in db
+    public function register(Request $request){
+
+        $newUser= $request->all();
+        $password=Hash::make($request->input('password'));
+        $newUser['password'] = $password;
+
+        return User::create($newUser);
+    }
+
+    // authenticate and return toen if user and password is walid
     public function authenticate(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -36,6 +47,7 @@ class TokenAuthController extends Controller
         return response()->json(compact('token'));
     }
 
+    // get user info
     public function getAuthenticatedUser()
     {
         try {
@@ -56,13 +68,5 @@ class TokenAuthController extends Controller
         return response()->json(compact('user'));
     }
 
-    // create new authenticated user in db
-    public function register(Request $request){
 
-        $newUser= $request->all();
-        $password=Hash::make($request->input('password'));
-        $newUser['password'] = $password;
-
-        return User::create($newUser);
-    }
 }

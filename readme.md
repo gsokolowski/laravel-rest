@@ -9,7 +9,7 @@ POSTMAN
 If you want to test the authentication API now you can do that by using Postman and passing  email and a password field as content of the request for the login after posting a first request to the register endpoint with also the name field. If all is made right the register request will return the created user and the authenticate request will return a json object with a single field token
 
 To register new user
-POST 
+POST
 http://localhost:8000/api/register?name=Nina&email=nina@gmail.com&password=abc1234
 
 Returns registered user
