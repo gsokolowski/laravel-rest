@@ -33,7 +33,8 @@ class TodoController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $todos = Todo::where('owner_id', $user->id)->get();
 
-        return $todos;
+        return response()->json(compact('todos'));
+        //return $todos;
     }
 
     public function store(Request $request)
