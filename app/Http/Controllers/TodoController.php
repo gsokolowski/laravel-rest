@@ -28,6 +28,7 @@ class TodoController extends Controller
         $log->addWarning('todo rest called');
     }
 
+    // works fine -- tested
     public function index()
     {
         $user = JWTAuth::parseToken()->authenticate();
@@ -37,6 +38,15 @@ class TodoController extends Controller
         //return $todos;
     }
 
+    // works fine -- tested
+    public function show(Request $request, $id) {
+        $user = JWTAuth::parseToken()->authenticate();
+        $todo = Todo::where('owner_id', $user->id)->where('id',$id)->first();
+
+        return response()->json(compact('todo'));
+    }
+
+    // works
     public function store(Request $request)
     {
         $user = JWTAuth::parseToken()->authenticate();
@@ -45,13 +55,17 @@ class TodoController extends Controller
         return Todo::create($newTodo);
     }
 
+
     public function update(Request $request, $id)
     {
         $user = JWTAuth::parseToken()->authenticate();
         $todo = Todo::where('owner_id', $user->id)->where('id',$id)->first();
 
         if($todo){
+            $todo->description=$request->input('description');
             $todo->is_done=$request->input('is_done');
+            $todo->created_at=$request->input('created_at');
+            $todo->updated_at=$request->input('updated_at');
             $todo->save();
             return $todo;
         }else{
@@ -66,7 +80,7 @@ class TodoController extends Controller
 
         if($todo){
             Todo::destroy($todo->id);
-            return  response('Success',200);;
+            return  response('Success',200);
         }else{
             return response('Unauthoraized',403);
         }
