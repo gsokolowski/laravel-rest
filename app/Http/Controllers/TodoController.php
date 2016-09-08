@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Todo;
 use Tymon\JWTAuth\Facades\JWTAuth as JWTAuth;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
@@ -31,11 +35,58 @@ class TodoController extends Controller
     // works fine -- tested
     public function index()
     {
-        $user = JWTAuth::parseToken()->authenticate();
-        $todos = Todo::where('owner_id', $user->id)->get();
 
-        return response()->json(compact('todos'));
-        //return $todos;
+//        try {
+//
+//            if (! $user = JWTAuth::parseToken()->authenticate()) {
+//                return response()->json(['user_not_found'], 404);
+//            } else {
+//                $todos = Todo::where('owner_id', $user->id)->get();
+//                return response()->json(compact('todos'));
+//            }
+//        } catch (TokenExpiredException $e) {
+//
+//            return response()->json(['token_expired'], $e->getStatusCode());
+//
+//        } catch (TokenInvalidException $e) {
+//
+//            return response()->json(['token_invalid'], $e->getStatusCode());
+//
+//        } catch (JWTException $e) {
+//
+//            return response()->json(['token_absent'], $e->getStatusCode());
+//
+//        }
+
+
+        // Done as PDO mode --------------------------------
+
+
+        try {
+
+            if (! $user = JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['user_not_found'], 404);
+            } else {
+                // PDO mode --------------------------------
+                // $todos is an array of objects (each row is separate object)
+                $todos = DB::select('select * from todos where id < ?', [37]);
+                return response()->json(compact('todos'));
+            }
+        } catch (TokenExpiredException $e) {
+
+            return response()->json(['token_expired'], $e->getStatusCode());
+
+        } catch (TokenInvalidException $e) {
+
+            return response()->json(['token_invalid'], $e->getStatusCode());
+
+        } catch (JWTException $e) {
+
+            return response()->json(['token_absent'], $e->getStatusCode());
+
+        }
+
+
     }
 
     // works fine -- tested
@@ -55,7 +106,7 @@ class TodoController extends Controller
         return Todo::create($newTodo);
     }
 
-
+    // works
     public function update(Request $request, $id)
     {
         $user = JWTAuth::parseToken()->authenticate();
@@ -72,7 +123,7 @@ class TodoController extends Controller
             return response('Unauthoraized',403);
         }
     }
-
+    // works
     public function destroy($id)
     {
         $user = JWTAuth::parseToken()->authenticate();
